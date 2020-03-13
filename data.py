@@ -51,12 +51,11 @@ def get_pair_path(im_dir, n_refs):
     return paths
 
 
-def load_image_pair(im_dir, n_refs):
+def load_image_pair(images, im_dir, n_refs):
     logger = get_logger()
     # 按照一定顺序获取给定文件夹下的一组数据
     paths = get_pair_path(im_dir, n_refs)
     # 将组织好的数据转为Image对象
-    images = []
 
     for p in paths:
         # logger.info(f'There are load_image_pair 62.')
@@ -77,7 +76,6 @@ def load_image_pair(im_dir, n_refs):
     # 对数据的尺寸进行验证
     assert images[0].shape[1] * SCALE == images[1].shape[1]
     assert images[0].shape[2] * SCALE == images[1].shape[2]
-    return images
 
 
 def im2tensor(im):
@@ -116,6 +114,8 @@ class PatchSet(Dataset):
         self.num_patches = self.num_im_pairs * self.num_patches_x * self.num_patches_y
         # self.num_patches = self.num_im_pairs
         self.transform = im2tensor
+        self.now_index = -1
+        self.images = []
 
     def map_index(self, index):
         # 将全局的index映射到具体的图像对文件夹索引(id_n)，图像裁剪的列号与行号(id_x, id_y)
@@ -127,21 +127,19 @@ class PatchSet(Dataset):
 
     def __getitem__(self, index):
         id_n, id_x, id_y = self.map_index(index)
-        images = load_image_pair(self.image_dirs[id_n], self.refs)
-        # images = load_image_pair(self.image_dirs[index], self.refs)
-        patches = [None] * len(images)
-        # for i in range(len(images)):
-        #     patches[i] = self.transform(images[i])
+        if id_n != self.now_index:
+            self.images.clear()
+            load_image_pair(self.images, self.image_dirs[id_n], self.refs)
+            self.now_index = id_n
+        patches = [None] * len(self.images)
         scales = [1, SCALE]
         for i in range(len(patches)):
             scale = scales[i % 2]
-            im = images[i][:,
+            im = self.images[i][:,
                  id_x * scale:(id_x + self.patch_size[0]) * scale,
                  id_y * scale:(id_y + self.patch_size[1]) * scale]
             patches[i] = self.transform(im)
 
-        del images[:]
-        del images
         return patches
 
     def __len__(self):
