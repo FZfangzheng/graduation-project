@@ -20,7 +20,7 @@ class Experiment(object):
         self.device = torch.device('cuda' if option.cuda else 'cpu')
         self.scale = 16
         self.image_size = option.image_size
-
+        self.max_image_cache = option.max_image_cache
         self.save_dir = option.save_dir
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.train_dir = self.save_dir / 'train'
@@ -116,9 +116,9 @@ class Experiment(object):
               num_workers=0, epochs=30, resume=True):
         # 加载数据
         self.logger.info('Loading data...')
-        train_set = PatchSet(train_dir, self.image_size, patch_size, patch_stride,
-                             n_refs=train_refs)
-        val_set = PatchSet(val_dir, self.image_size, patch_size, n_refs=train_refs)
+        train_set = PatchSet(train_dir, self.image_size, patch_size, self.max_image_cache,
+                             patch_stride, train_refs)
+        val_set = PatchSet(val_dir, self.image_size, patch_size, self.max_image_cache, n_refs=train_refs)
         train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True,
                                   num_workers=num_workers, drop_last=True)
         val_loader = DataLoader(val_set, batch_size=batch_size, num_workers=num_workers)
@@ -161,7 +161,7 @@ class Experiment(object):
         rows = int(self.image_size[1] / patch_size[1])
         cols = int(self.image_size[0] / patch_size[0])
         n_blocks = rows * cols
-        test_set = PatchSet(test_dir, self.image_size, patch_size, n_refs=test_refs)
+        test_set = PatchSet(test_dir, self.image_size, patch_size, self.max_image_cache, n_refs=test_refs)
         test_loader = DataLoader(test_set, batch_size=1, num_workers=num_workers)
 
         scaled_patch_size = tuple(i * self.scale for i in patch_size)

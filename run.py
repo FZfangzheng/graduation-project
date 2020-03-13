@@ -22,6 +22,8 @@ parser.add_argument('--batch_size', type=int, default=32,
                     help='input batch size for training')
 parser.add_argument('--epochs', type=int, default=30,
                     help='number of epochs to train')
+parser.add_argument('--max_image_cache', type=int, default=10,
+                    help='number of image catch')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--ngpu', type=int, default=1, help='number of GPUs to use')
 parser.add_argument('--num_workers', type=int, default=1, help='number of threads to load data')
