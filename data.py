@@ -27,11 +27,24 @@ SCALE = 1
 def find_minimum_index(array):
     minimum = array[0]
     minimum_index = 0
+
     for i in range(len(array)):
-        if i < minimum:
+        if array[i] < minimum:
             minimum = array[i]
             minimum_index = i
     return minimum_index
+
+
+# 找到cache里使用最多的那个
+def find_maximum_index(array, cache_array):
+    maximum = array[cache_array[0]]
+    maximum_index = cache_array[0]
+    for i in range(len(array)):
+        if array[i] > maximum and i in cache_array:
+            maximum = array[i]
+            maximum_index = i
+    return maximum_index
+
 
 def get_pair_path(im_dir, n_refs):
     # 将一组数据集按照规定的顺序组织好
@@ -150,7 +163,7 @@ class PatchSet(Dataset):
         for i in range(self.num_cache):
             load_image_pair(self.images, self.image_dirs[i], self.refs)
         self.now_cache_index = [i for i in range(self.num_cache)]
-        self.now_cache_index_amount_used = [0 for i in range(self.num_cache)]
+        self.now_cache_index_amount_used = [0 for i in range(self.num_im_pairs)]
 
     def map_index(self, index):
         # 将全局的index映射到具体的图像对文件夹索引(id_n)，图像裁剪的列号与行号(id_x, id_y)
@@ -165,12 +178,14 @@ class PatchSet(Dataset):
         id_n, id_x, id_y = self.map_index(index)
         if id_n in self.now_cache_index:
             images = self.images[self.now_cache_index.index(id_n)]
+            self.now_cache_index_amount_used[id_n] += 1
         else:
-            minimum_index = find_minimum_index(self.now_cache_index_amount_used)
-            self.now_cache_index[minimum_index] = id_n
-            self.now_cache_index_amount_used[minimum_index] = 0
-            load_image_pair_in_specified_location(self.images, self.image_dirs[id_n], self.refs, minimum_index)
-            images = self.images[minimum_index]
+            maximum_index = find_maximum_index(self.now_cache_index_amount_used, self.now_cache_index)
+            location = self.now_cache_index.index(maximum_index)
+            self.now_cache_index[location] = id_n
+            load_image_pair_in_specified_location(self.images, self.image_dirs[id_n], self.refs, location)
+            images = self.images[location]
+            self.now_cache_index_amount_used[id_n] += 1
         patches = [None] * len(images)
         scales = [1, SCALE]
         for i in range(len(patches)):

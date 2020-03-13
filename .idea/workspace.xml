@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="69560d66-a601-4df9-af14-f3083a0b323c" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,7 +21,7 @@
       <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
+            <state relative-caret-position="180">
               <caret line="24" column="38" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="38" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
@@ -46,7 +45,7 @@
       <file leaf-file-name="experiment.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
+            <state relative-caret-position="2961">
               <caret line="120" column="26" selection-start-line="120" selection-start-column="18" selection-end-line="120" selection-end-column="26" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
@@ -58,8 +57,8 @@
       <file leaf-file-name="data.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="172" column="47" selection-start-line="172" selection-start-column="47" selection-end-line="172" selection-end-column="47" />
+            <state relative-caret-position="272">
+              <caret line="187" column="49" selection-start-line="187" selection-start-column="49" selection-end-line="187" selection-end-column="49" />
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
               </folding>
@@ -156,8 +155,8 @@
       <list>
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/model.py" />
-        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/experiment.py" />
+        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/data.py" />
       </list>
     </option>
@@ -288,6 +287,14 @@
       <option name="presentableId" value="Default" />
       <updated>1582784674696</updated>
     </task>
+    <task id="LOCAL-00001" summary="test on GPU">
+      <created>1584094954248</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1584094954248</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -323,6 +330,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="test on GPU" />
+    <option name="LAST_COMMIT_MESSAGE" value="test on GPU" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/model.py">
@@ -746,7 +757,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state relative-caret-position="180">
           <caret line="24" column="38" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="38" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
@@ -756,7 +767,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
+        <state relative-caret-position="2961">
           <caret line="120" column="26" selection-start-line="120" selection-start-column="18" selection-end-line="120" selection-end-column="26" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
@@ -766,8 +777,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="172" column="47" selection-start-line="172" selection-start-column="47" selection-end-line="172" selection-end-column="47" />
+        <state relative-caret-position="272">
+          <caret line="187" column="49" selection-start-line="187" selection-start-column="49" selection-end-line="187" selection-end-column="49" />
           <folding>
             <element signature="e#0#24#0" expanded="true" />
           </folding>
