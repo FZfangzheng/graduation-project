@@ -1,6 +1,7 @@
 from pathlib import Path
 import numpy as np
 import rasterio
+from timeit import default_timer as timer
 from osgeo import gdal
 import math
 from collections import OrderedDict
@@ -126,6 +127,7 @@ class PatchSet(Dataset):
         return id_n, id_x, id_y
 
     def __getitem__(self, index):
+        t_start = timer()
         id_n, id_x, id_y = self.map_index(index)
         if id_n != self.now_index:
             self.images.clear()
@@ -140,6 +142,8 @@ class PatchSet(Dataset):
                  id_y * scale:(id_y + self.patch_size[1]) * scale]
             patches[i] = self.transform(im)
 
+        t_end = timer()
+        self.logger.info(f'spend on read images: {t_end - t_start}s')
         return patches
 
     def __len__(self):
