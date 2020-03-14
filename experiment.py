@@ -18,7 +18,7 @@ import pandas as pd
 class Experiment(object):
     def __init__(self, option):
         self.device = torch.device('cuda' if option.cuda else 'cpu')
-        self.scale = 16
+        self.scale = 1
         self.image_size = option.image_size
         self.max_image_cache = option.max_image_cache
         self.save_dir = option.save_dir
@@ -166,7 +166,8 @@ class Experiment(object):
 
         scaled_patch_size = tuple(i * self.scale for i in patch_size)
         scaled_image_size = tuple(i * self.scale for i in self.image_size)
-        scale_factor = 10000
+        # scale_factor = 10000
+        scale_factor = 1
         with torch.no_grad():
             im_count = 0
             patches = []
@@ -201,7 +202,7 @@ class Experiment(object):
                             block_count += 1
                     patches.clear()
                     # 存储预测影像结果
-                    result = result.astype(np.int16)
+                    result = result.astype(np.uint8)
                     prototype = str(image_paths[im_count][1])
                     utils.save_array_as_tif(result, self.test_dir / name, prototype=prototype)
                     im_count += 1
