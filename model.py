@@ -124,11 +124,13 @@ class FusionNet(nn.Module):
         # inputs[1]是参考Landsat，inputs[0]和inputs[-1](即数组最后一个)是参考MODIS和目标时间的MODIS
         # inputs[0] = interpolate(inputs[0], scale_factor=16)
         # inputs[-1] = interpolate(inputs[-1], scale_factor=16)
-        c_diff1 = torch.sub(inputs[-1], inputs[0])
-        prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1], c_diff1), 1))
+        # c_diff1 = torch.sub(inputs[-1], inputs[0])
+        # prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1], c_diff1), 1))
+        prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1]), 1))
         # len==5则表示有两对参考
         if len(inputs) == 5:
             # c_diff2 = torch.sub(inputs[2], inputs[-1])
+            # next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1], c_diff2), 1))
             next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1]), 1))
             if self.training:
                 prev_fusion = self.encoder(inputs[1]) + prev_diff
