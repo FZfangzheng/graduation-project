@@ -59,7 +59,7 @@ class FEncoder(nn.Sequential):
 
 class REncoder(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS * 4, 32, 64, 128, 256]
+        channels = [NUM_BANDS * 3, 32, 64, 128, 256]
         super(REncoder, self).__init__(
             conv3x3(channels[0], channels[1]),
             nn.ReLU(True),
@@ -128,8 +128,8 @@ class FusionNet(nn.Module):
         prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1], c_diff1), 1))
         # len==5则表示有两对参考
         if len(inputs) == 5:
-            c_diff2 = torch.sub(inputs[2], inputs[-1])
-            next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1], c_diff2), 1))
+            # c_diff2 = torch.sub(inputs[2], inputs[-1])
+            next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1]), 1))
             if self.training:
                 prev_fusion = self.encoder(inputs[1]) + prev_diff
                 next_fusion = self.encoder(inputs[3]) + next_diff
@@ -154,8 +154,8 @@ class FusionNet(nn.Module):
                 # next_fusion[prev_dist < next_dist] = zero
                 # result = prev_fusion + next_fusion
                 result = self.decoder(result)
-                f_diff = torch.sub(inputs[3], inputs[1])
-                result = self.truing(torch.cat((result, f_diff), 1))
+                # f_diff = torch.sub(inputs[3], inputs[1])
+                # result = self.truing(torch.cat((result, f_diff), 1))
                 return result
         else:
             return self.decoder(self.encoder(inputs[1]) + prev_diff)
