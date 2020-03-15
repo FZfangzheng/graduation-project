@@ -13,10 +13,30 @@ def conv3x3(in_channels, out_channels, stride=1):
         nn.Conv2d(in_channels, out_channels, 3, stride=stride)
     )
 
-
 # def interpolate(inputs, size=None, scale_factor=None):
 #     return F.interpolate(inputs, size=size, scale_factor=scale_factor,
 #                          mode='bilinear', align_corners=True)
+
+
+class ResidualBlock(nn.Module):
+    """实现一个残差块"""
+    def __init__(self, inchannel, outchannel, stride=1, shortcut=None):
+
+        super().__init__()
+        self.left = nn.Sequential(
+            nn.Conv2d(inchannel, outchannel, 3, stride, 1, bias=False),
+            nn.BatchNorm2d(outchannel),
+            nn.ReLU(),
+            nn.Conv2d(outchannel, outchannel, 3, 1, 1, bias=False),  # 这个卷积操作是不会改变w h的
+            nn.BatchNorm2d(outchannel)
+        )
+        self.right = shortcut
+
+    def forward(self, input):
+        out = self.left(input)
+        residual = input if self.right is None else self.right(input)
+        out += residual
+        return F.relu(out)
 
 
 class CompoundLoss(nn.Module):
@@ -61,14 +81,18 @@ class REncoder(nn.Sequential):
     def __init__(self):
         channels = [NUM_BANDS * 3, 32, 64, 128, 256]
         super(REncoder, self).__init__(
-            conv3x3(channels[0], channels[1]),
-            nn.ReLU(True),
-            conv3x3(channels[1], channels[2]),
-            nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
-            nn.ReLU(True)
+            ResidualBlock(channels[0], channels[1]),
+            ResidualBlock(channels[1], channels[2]),
+            ResidualBlock(channels[2], channels[3]),
+            ResidualBlock(channels[3], channels[4]),
+            # conv3x3(channels[0], channels[1]),
+            # nn.ReLU(True),
+            # conv3x3(channels[1], channels[2]),
+            # nn.ReLU(True),
+            # conv3x3(channels[2], channels[3]),
+            # nn.ReLU(True),
+            # conv3x3(channels[3], channels[4]),
+            # nn.ReLU(True)
         )
 
 
