@@ -20,8 +20,11 @@ def conv3x3(in_channels, out_channels, stride=1):
 
 class ResidualBlock(nn.Module):
     """实现一个残差块"""
-    def __init__(self, inchannel, outchannel, stride=1, shortcut=None):
-
+    def __init__(self, inchannel, outchannel, stride=1):
+        shortcut = nn.Sequential(
+            nn.Conv2d(inchannel, outchannel, 1, stride, bias=False),
+            nn.BatchNorm2d(outchannel)
+        )
         super().__init__()
         self.left = nn.Sequential(
             nn.Conv2d(inchannel, outchannel, 3, stride, 1, bias=False),
