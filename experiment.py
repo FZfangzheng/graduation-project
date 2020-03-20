@@ -35,14 +35,10 @@ class Experiment(object):
         self.logger.info('Model initialization')
 
         self.model = FusionNet().to(self.device)
-        self.pretrained = Pretrained().to(self.device)
         if option.cuda and option.ngpu > 1:
             device_ids = [i for i in range(option.ngpu)]
             self.model = nn.DataParallel(self.model, device_ids=device_ids)
-            self.pretrained = nn.DataParallel(self.pretrained, device_ids=device_ids)
-        # utils.load_pretrained(self.pretrained, option.pretrained)
 
-        #self.criterion = CompoundLoss(self.pretrained)
         self.criterion = CompoundLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=option.lr, weight_decay=1e-6)
 
@@ -54,36 +50,38 @@ class Experiment(object):
         self.model.train()
         epoch_loss = utils.AverageMeter()
         epoch_score = utils.AverageMeter()
-        batches = len(data_loader)
+        batches = len(data_loader)*3
         self.logger.info(f'Epoch[{n_epoch}] - {datetime.now()}')
         for idx, data in enumerate(data_loader):
             t_start = timer()
             data = [im.to(self.device) for im in data]
             # input是除了最后的data数据，target是最后的data数据
-            # 我们可以得出，input若大小为3，则[参考MODIS，参考Landsat，目标MODIS]
-            # target为目标Landsat
-            inputs = data[:-1]
-            target = data[-1]
+            # 我们可以得出，data大小为6，
+            # 且[参考MODIS1，参考Landsat1，参考MODIS2，参考Landsat2, 目标MODIS，目标Landsat]
+            data1 = data[0:2]
+            data2 = data[2:4]
+            data3 = data[4:6]
+            all_data = [data1, data2, data3]
+            new_idx = idx * 3 - 3
+            for i in range(len(all_data)):
+                new_idx += 1
+                inputs = all_data[i]
+                target = all_data[i][-1]
+                self.optimizer.zero_grad()
+                pre_lsr_landsat1, lsr_landsat1, pre_landsat1 = self.model(inputs)
+                loss = (0.5 * (F.mse_loss(pre_lsr_landsat1, lsr_landsat1) + F.mse_loss(pre_landsat1, target)))
+                epoch_loss.update(loss.item())
+                loss.backward()
+                self.optimizer.step()
 
-            self.optimizer.zero_grad()
-            predictions = self.model(inputs)
-            loss = (0.5 * (self.criterion(predictions[0], target) +
-                           self.criterion(predictions[1], target))
-                    if len(predictions) == 2 else self.criterion(predictions, target))
-            epoch_loss.update(loss.item())
-            loss.backward()
-            self.optimizer.step()
-
-            with torch.no_grad():
-                score = (0.5 * (F.mse_loss(predictions[0], target) +
-                                F.mse_loss(predictions[1], target))
-                         if len(predictions) == 2 else F.mse_loss(predictions, target))
-            epoch_score.update(score.item())
-            t_end = timer()
-            self.logger.info(f'Epoch[{n_epoch} {idx}/{batches}] - '
-                             f'Loss: {loss.item():.10f} - '
-                             f'MSE: {score.item():.5f} - '
-                             f'Time: {t_end - t_start}s')
+                with torch.no_grad():
+                    score = (0.5 * (F.mse_loss(pre_lsr_landsat1, lsr_landsat1) + F.mse_loss(pre_landsat1, target)))
+                epoch_score.update(score.item())
+                t_end = timer()
+                self.logger.info(f'Epoch[{n_epoch} {new_idx}/{batches}] - '
+                                 f'Loss: {loss.item():.10f} - '
+                                 f'MSE: {score.item():.5f} - '
+                                 f'Time: {t_end - t_start}s')
 
         self.logger.info(f'Epoch[{n_epoch}] - {datetime.now()}')
         return epoch_loss.avg, epoch_score.avg
