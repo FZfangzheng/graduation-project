@@ -84,7 +84,7 @@ class REncoder(nn.Sequential):
         super(REncoder, self).__init__(
             ResidualBlock(channels[0], channels[1]),
             ResidualBlock(channels[1], channels[2]),
-            ResidualBlock(channels[2], channels[3]),
+            conv3x3(channels[2], channels[3]),
         )
 
 
