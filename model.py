@@ -1,16 +1,25 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import numpy as np
 from ssim import msssim
 
 NUM_BANDS = 6
 
 
-def conv3x3(in_channels, out_channels, stride=1):
+def getads(array):
+    amount = 0
+    total = 0
+    for item in array.flat:
+        amount += 1
+        total += item
+    return total/amount
+
+
+def conv(in_channels, out_channels, size, stride=1):
     return nn.Sequential(
-        nn.ReplicationPad2d(1),
-        nn.Conv2d(in_channels, out_channels, 3, stride=stride)
+        nn.ReplicationPad2d((size-1)/2),
+        nn.Conv2d(in_channels, out_channels, size, stride=stride)
     )
 
 
@@ -42,120 +51,63 @@ class CompoundLoss(nn.Module):
                                            normalize=self.normalize)))
 
 
-class FEncoder(nn.Sequential):
+class DCNN_mapping1(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS, 32, 64, 128, 256]
-        super(FEncoder, self).__init__(
-            conv3x3(channels[0], channels[1]),
+        channels = [NUM_BANDS*2, 32, 16, NUM_BANDS]
+        super(DCNN_mapping1, self).__init__(
+            conv(channels[0], channels[1], 9),
             nn.ReLU(True),
-            conv3x3(channels[1], channels[2]),
+            conv(channels[1], channels[2], 5),
             nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
-            nn.ReLU(True)
+            conv(channels[2], channels[3], 5)
         )
 
 
-class REncoder(nn.Sequential):
+class DCNN_mapping2(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS * 4, 32, 64, 128, 256]
-        super(REncoder, self).__init__(
-            conv3x3(channels[0], channels[1]),
+        channels = [NUM_BANDS*2, 32, 16, NUM_BANDS]
+        super(DCNN_mapping2, self).__init__(
+            conv(channels[0], channels[1], 9),
             nn.ReLU(True),
-            conv3x3(channels[1], channels[2]),
+            conv(channels[1], channels[2], 5),
             nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
-            nn.ReLU(True)
-        )
-
-
-class Decoder(nn.Sequential):
-    def __init__(self):
-        channels = [256, 128, 64, 32, NUM_BANDS]
-        super(Decoder, self).__init__(
-            conv3x3(channels[0], channels[1]),
-            nn.ReLU(True),
-            conv3x3(channels[1], channels[2]),
-            nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            nn.Conv2d(channels[3], channels[4], 1)
-        )
-
-class Truing(nn.Sequential):
-    def __init__(self):
-        channels = [NUM_BANDS*2, 32, 64, 32, NUM_BANDS]
-        super(Truing, self).__init__(
-            conv3x3(channels[0], channels[1]),
-            nn.ReLU(True),
-            conv3x3(channels[1], channels[2]),
-            nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            nn.Conv2d(channels[3], channels[4], 1)
-        )
-
-class Pretrained(nn.Sequential):
-    def __init__(self):
-        channels = [NUM_BANDS, 32, 64, 128]
-        super(Pretrained, self).__init__(
-            conv3x3(channels[0], channels[1]),
-            nn.ReLU(True),
-            conv3x3(channels[1], channels[2], 2),
-            nn.ReLU(True),
-            conv3x3(channels[2], channels[3], 2),
-            nn.ReLU(True)
+            conv(channels[2], channels[3], 5)
         )
 
 
 class FusionNet(nn.Module):
     def __init__(self):
         super(FusionNet, self).__init__()
-        self.encoder = FEncoder()
-        self.residual = REncoder()
-        self.decoder = Decoder()
-        self.truing = Truing()
+        self.dm1 = DCNN_mapping1()
+        self.dm2 = DCNN_mapping1()
 
     def forward(self, inputs):
-        # 原本是300上采样到4800，但是这里不用，给出的MODIS和Landsat一样
-        # inputs[1]是参考Landsat，inputs[0]和inputs[-1](即数组最后一个)是参考MODIS和目标时间的MODIS
-        # inputs[0] = interpolate(inputs[0], scale_factor=16)
-        # inputs[-1] = interpolate(inputs[-1], scale_factor=16)
-        c_diff1 = torch.sub(inputs[-1], inputs[0])
-        prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1], c_diff1), 1))
-        # len==5则表示有两对参考
-        if len(inputs) == 5:
-            c_diff2 = torch.sub(inputs[2], inputs[-1])
-            next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1], c_diff2), 1))
-            if self.training:
-                prev_fusion = self.encoder(inputs[1]) + prev_diff
-                next_fusion = self.encoder(inputs[3]) + next_diff
-                return self.decoder(prev_fusion), self.decoder(next_fusion)
-            else:
-                # zero = inputs[0].new_tensor(0.0)
-                one = inputs[0].new_tensor(1.0)
-                epsilon = inputs[0].new_tensor(1e-8)
-                # threshold = inputs[0].new_tensor(0.2)
-                prev_dist = torch.abs(prev_diff) + epsilon
-                next_dist = torch.abs(next_diff) + epsilon
-                prev_mask = one.div(prev_dist).div(one.div(prev_dist) + one.div(next_dist))
-                # prev_mask[prev_dist - next_dist > threshold] = zero
-                # prev_mask[next_dist - prev_dist > threshold] = one
-                prev_mask = prev_mask.clamp_(0.0, 1.0)
-                next_mask = one - prev_mask
-                result = (prev_mask * (self.encoder(inputs[1]) + prev_diff) +
-                          next_mask * (self.encoder(inputs[3]) + next_diff))
-                # prev_fusion = self.encoder(inputs[1]) + prev_diff
-                # next_fusion = self.encoder(inputs[3]) + next_diff
-                # prev_fusion[prev_dist >= next_dist] = zero
-                # next_fusion[prev_dist < next_dist] = zero
-                # result = prev_fusion + next_fusion
-                result = self.decoder(result)
-                f_diff = torch.sub(inputs[3], inputs[1])
-                result = self.truing(torch.cat((result, f_diff), 1))
-                return result
+        c1 = inputs[0]
+        f1 = inputs[1]
+        c3 = inputs[2]
+        f3 = inputs[3]
+        c2 = inputs[4]
+        c12 = c2 - c1
+        c23 = c3 - c2
+        if self.training:
+            c13 = c3 - c1
+            f13 = f3 - f1
+            pre1_f13 = self.dm1(torch.cat(c13, f1), 1)
+            pre2_f13 = self.dm2(torch.cat(c13, f3), 1)
+            pre_f13 = self.dm1(torch.cat(c12, f1), 1) + self.dm2(torch.cat(c23, f3), 1)
+            return pre1_f13, pre2_f13, pre_f13, f13
         else:
-            return self.decoder(self.encoder(inputs[1]) + prev_diff)
+            f12 = self.dm1(torch.cat((c12, f1), 1))
+            f23 = self.dm2(torch.cat((c23, f3), 1))
+
+            vc12 = getads(np.array(c12))
+            vc23 = getads(np.array(c23))
+
+            if vc23 - vc12 > 0.2:
+                result = f1 + f12
+            elif vc12 - vc23 > 0.2:
+                result = f3 - f23
+            else:
+                canshu_alpha = (1 / vc12) / ((1 / vc12) + (1 / vc23))
+                result = canshu_alpha * (f1 + f12) + (1 - canshu_alpha) * (f3 - f23)
+            return result
