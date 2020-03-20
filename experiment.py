@@ -35,11 +35,9 @@ class Experiment(object):
         self.logger.info('Model initialization')
 
         self.model = FusionNet().to(self.device)
-        self.pretrained = Pretrained().to(self.device)
         if option.cuda and option.ngpu > 1:
             device_ids = [i for i in range(option.ngpu)]
             self.model = nn.DataParallel(self.model, device_ids=device_ids)
-            self.pretrained = nn.DataParallel(self.pretrained, device_ids=device_ids)
         # utils.load_pretrained(self.pretrained, option.pretrained)
 
         #self.criterion = CompoundLoss(self.pretrained)
