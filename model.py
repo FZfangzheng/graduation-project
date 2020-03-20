@@ -67,74 +67,36 @@ class CompoundLoss(nn.Module):
 
 class FEncoder(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS, 32, 64, 128, 256]
+        channels = [NUM_BANDS, 32, 64, 128]
         super(FEncoder, self).__init__(
             conv3x3(channels[0], channels[1]),
             nn.ReLU(True),
             conv3x3(channels[1], channels[2]),
             nn.ReLU(True),
             conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
             nn.ReLU(True)
         )
 
 
 class REncoder(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS * 3, 32, 64, 128, 256]
+        channels = [NUM_BANDS * 3, 32, 64, 128]
         super(REncoder, self).__init__(
             ResidualBlock(channels[0], channels[1]),
             ResidualBlock(channels[1], channels[2]),
             ResidualBlock(channels[2], channels[3]),
-            ResidualBlock(channels[3], channels[4]),
-            # conv3x3(channels[0], channels[1]),
-            # nn.ReLU(True),
-            # conv3x3(channels[1], channels[2]),
-            # nn.ReLU(True),
-            # conv3x3(channels[2], channels[3]),
-            # nn.ReLU(True),
-            # conv3x3(channels[3], channels[4]),
-            # nn.ReLU(True)
         )
 
 
 class Decoder(nn.Sequential):
     def __init__(self):
-        channels = [256, 128, 64, 32, NUM_BANDS]
+        channels = [128, 64, 32, NUM_BANDS]
         super(Decoder, self).__init__(
             conv3x3(channels[0], channels[1]),
             nn.ReLU(True),
             conv3x3(channels[1], channels[2]),
             nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            nn.Conv2d(channels[3], channels[4], 1)
-        )
-
-class Truing(nn.Sequential):
-    def __init__(self):
-        channels = [NUM_BANDS*2, 32, 64, 32, NUM_BANDS]
-        super(Truing, self).__init__(
-            conv3x3(channels[0], channels[1]),
-            nn.ReLU(True),
-            conv3x3(channels[1], channels[2]),
-            nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            nn.Conv2d(channels[3], channels[4], 1)
-        )
-
-class Pretrained(nn.Sequential):
-    def __init__(self):
-        channels = [NUM_BANDS, 32, 64, 128]
-        super(Pretrained, self).__init__(
-            conv3x3(channels[0], channels[1]),
-            nn.ReLU(True),
-            conv3x3(channels[1], channels[2], 2),
-            nn.ReLU(True),
-            conv3x3(channels[2], channels[3], 2),
-            nn.ReLU(True)
+            nn.Conv2d(channels[2], channels[3], 1)
         )
 
 
@@ -144,7 +106,6 @@ class FusionNet(nn.Module):
         self.encoder = FEncoder()
         self.residual = REncoder()
         self.decoder = Decoder()
-        self.truing = Truing()
 
     def forward(self, inputs):
         # 原本是300上采样到4800，但是这里不用，给出的MODIS和Landsat一样
