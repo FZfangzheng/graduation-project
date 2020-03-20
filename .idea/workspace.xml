@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="69560d66-a601-4df9-af14-f3083a0b323c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -44,7 +44,7 @@
       <file leaf-file-name="experiment.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3690">
+            <state relative-caret-position="210">
               <caret line="39" column="75" selection-start-line="39" selection-start-column="75" selection-end-line="39" selection-end-column="75" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
@@ -333,7 +333,21 @@
       <option name="project" value="LOCAL" />
       <updated>1584693158579</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="deal with some error">
+      <created>1584693487443</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1584693487443</updated>
+    </task>
+    <task id="LOCAL-00008" summary="must push">
+      <created>1584693714929</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1584693714929</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -392,7 +406,9 @@
     <MESSAGE value="four conv layers" />
     <MESSAGE value="resovle some error" />
     <MESSAGE value="new_resnet" />
-    <option name="LAST_COMMIT_MESSAGE" value="new_resnet" />
+    <MESSAGE value="deal with some error" />
+    <MESSAGE value="must push" />
+    <option name="LAST_COMMIT_MESSAGE" value="must push" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/model.py">
@@ -836,7 +852,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3690">
+        <state relative-caret-position="210">
           <caret line="39" column="75" selection-start-line="39" selection-start-column="75" selection-end-line="39" selection-end-column="75" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
