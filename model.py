@@ -12,7 +12,7 @@ def getads(array):
     total = 0
     for item in array.flat:
         amount += 1
-        total += item
+        total += abs(item)
     return total/amount
 
 
@@ -100,8 +100,8 @@ class FusionNet(nn.Module):
             f12 = self.dm1(torch.cat((c12, f1), 1))
             f23 = self.dm2(torch.cat((c23, f3), 1))
 
-            vc12 = getads(np.array(c12))
-            vc23 = getads(np.array(c23))
+            vc12 = getads(c12.cpu().numpy())
+            vc23 = getads(c23.cpu().numpy())
 
             if vc23 - vc12 > 0.2:
                 result = f1 + f12
