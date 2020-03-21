@@ -92,6 +92,8 @@ class FusionNet(nn.Module):
         if self.training:
             c13 = c3 - c1
             f13 = f3 - f1
+            print(c13.shape)
+            print(f1.shape)
             pre1_f13 = self.dm1(torch.cat(c13, f1), 1)
             pre2_f13 = self.dm2(torch.cat(c13, f3), 1)
             pre_f13 = self.dm1(torch.cat(c12, f1), 1) + self.dm2(torch.cat(c23, f3), 1)
