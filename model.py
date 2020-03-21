@@ -98,6 +98,8 @@ class FusionNet(nn.Module):
         self.fine_net = LTHSNet()
         self.reconstruct_net = ReconstructNet()
 
+        self.conv = conv3x3(128, NUM_BANDS)
+
     def forward(self, inputs):
         modis1 = inputs[0]
         landsat1 = interpolate(inputs[1], scale_factor=16)
@@ -107,6 +109,7 @@ class FusionNet(nn.Module):
         htls1 = self.coarse_net(modis1)
         lths1 = self.fine_net(landsat1)
         result = htls + lths1 - htls1
-        result = self.reconstruct_net(result)
-        result = interpolate(result, scale_factor=1/16)
+        result = self.conv(result)
+        # result = self.reconstruct_net(result)
+        result = interpolate(result, scale_factor=1/8)
         return result
