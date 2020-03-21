@@ -1,7 +1,12 @@
 import torch.nn as nn
-
+import torch.nn.functional as F
 
 NUM_BANDS = 6
+
+
+def interpolate(inputs, size=None, scale_factor=None):
+    return F.interpolate(inputs, size=size, scale_factor=scale_factor,
+                         mode='bilinear', align_corners=True)
 
 
 def conv3x3(in_channels, out_channels):
@@ -95,7 +100,7 @@ class FusionNet(nn.Module):
 
     def forward(self, inputs):
         modis1 = inputs[0]
-        landsat1 = inputs[1]
+        landsat1 = interpolate(inputs[1], scale_factor=16)
         modis = inputs[2]
         print(inputs[0].shape)
         print(inputs[1].shape)
@@ -109,5 +114,6 @@ class FusionNet(nn.Module):
         print(htls1.shape)
         result = htls + lths1 - htls1
 
-        result = self.reconstruct_net(result)
+        result = interpolate(self.reconstruct_net(result), scale_factor=1/16)
+        print(result.shape)
         return result
