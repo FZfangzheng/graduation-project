@@ -30,8 +30,8 @@
       <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="129">
-              <caret line="77" column="32" selection-start-line="77" selection-start-column="12" selection-end-line="77" selection-end-column="32" />
+            <state relative-caret-position="279">
+              <caret line="100" column="32" selection-start-line="100" selection-start-column="12" selection-end-line="100" selection-end-column="32" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -170,7 +170,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="299" />
     <option name="y" value="10" />
     <option name="width" value="974" />
@@ -343,7 +343,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -843,8 +843,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="129">
-          <caret line="77" column="32" selection-start-line="77" selection-start-column="12" selection-end-line="77" selection-end-column="32" />
+        <state relative-caret-position="279">
+          <caret line="100" column="32" selection-start-line="100" selection-start-column="12" selection-end-line="100" selection-end-column="32" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
