@@ -72,7 +72,7 @@ class ReconstructNet(nn.Module):
         self.deconv = deconv3x3(channels[-1], channels[-2])
         self.relu = nn.ReLU(inplace=True)
         self.dense1 = nn.Linear(channels[-2], channels[-3])
-        self.dense2 = nn.Linear(channels[-3], 1)
+        self.dense2 = nn.Linear(channels[-3], NUM_BANDS)
 
     def forward(self, x):
         out = x
@@ -97,9 +97,9 @@ class FusionNet(nn.Module):
         modis1 = inputs[0]
         landsat1 = inputs[1]
         modis = inputs[2]
-        print(inputs[0])
-        print(inputs[1])
-        print(inputs[2])
+        print(inputs[0].shape)
+        print(inputs[1].shape)
+        print(inputs[2].shape)
         htls = self.coarse_net(modis)
 
         htls1 = self.coarse_net(modis1)
