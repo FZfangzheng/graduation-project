@@ -73,7 +73,7 @@ class Experiment(object):
 
                 with torch.no_grad():
                     score = utils.score(prediction, target, utils.ssim)
-                epoch_score.update(score.item())
+                epoch_score.update(score)
                 t_end = timer()
                 self.logger.info(f'Epoch[{n_epoch} {new_idx}/{batches}] - '
                                  f'Loss: {loss.item():.10f} - '

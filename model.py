@@ -102,18 +102,11 @@ class FusionNet(nn.Module):
         modis1 = inputs[0]
         landsat1 = interpolate(inputs[1], scale_factor=16)
         modis = inputs[2]
-        print(inputs[0].shape)
-        print(inputs[1].shape)
-        print(inputs[2].shape)
         htls = self.coarse_net(modis)
 
         htls1 = self.coarse_net(modis1)
         lths1 = self.fine_net(landsat1)
-        print(htls.shape)
-        print(lths1.shape)
-        print(htls1.shape)
         result = htls + lths1 - htls1
 
         result = interpolate(self.reconstruct_net(result), scale_factor=1/16)
-        print(result.shape)
         return result
