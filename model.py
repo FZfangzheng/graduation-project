@@ -99,15 +99,14 @@ class FusionNet(nn.Module):
         self.reconstruct_net = ReconstructNet()
 
     def forward(self, inputs):
-        # modis1 = inputs[0]
+        modis1 = inputs[0]
         landsat1 = interpolate(inputs[1], scale_factor=16)
-        # modis = inputs[2]
-        # htls = self.coarse_net(modis)
+        modis = inputs[2]
+        htls = self.coarse_net(modis)
 
-        # htls1 = self.coarse_net(modis1)
+        htls1 = self.coarse_net(modis1)
         lths1 = self.fine_net(landsat1)
-        # result = htls + lths1 - htls1
-        result = interpolate(lths1, scale_factor=8)
-        # result = interpolate(self.reconstruct_net(lths1), scale_factor=1 / 16)
-        # result = interpolate(self.reconstruct_net(result), scale_factor=1/16)
+        result = htls + lths1 - htls1
+        result = self.reconstruct_net(result)
+        result = interpolate(result, scale_factor=1/16)
         return result
