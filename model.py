@@ -66,9 +66,15 @@ class FusionNet(nn.Module):
         # 首先因为数据集给出的图像尺度相同，所以做下采样处理，下采样降低十倍分辨率
         if self.training:
             modis1 = interpolate(inputs[0], scale_factor=0.1)
+            print(modis1.shape)
             lsr_landsat1 = interpolate(inputs[1], scale_factor=0.1)
-            pre_lsr_landsat1 = torch.add(modis1, self.nml(modis1))
-            pre_landsat1 = torch.add(pre_lsr_landsat1, self.sr(pre_lsr_landsat1))
+            print(lsr_landsat1.shape)
+            nml1 = self.nml(modis1)
+            print(nml1.shape)
+            pre_lsr_landsat1 = torch.add(modis1, nml1)
+            sr1 = self.sr(pre_lsr_landsat1)
+            print(sr1.shape)
+            pre_landsat1 = torch.add(pre_lsr_landsat1, sr1)
             return pre_lsr_landsat1, lsr_landsat1, pre_landsat1
         else:
             modis1 = interpolate(inputs[0], scale_factor=0.1)
