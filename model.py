@@ -108,6 +108,6 @@ class FusionNet(nn.Module):
         lths1 = self.fine_net(landsat1)
         # result = htls + lths1 - htls1
 
-        result = interpolate(lths1, scale_factor=1 / 16)
+        result = interpolate(self.reconstruct_net(lths1), scale_factor=1 / 16)
         # result = interpolate(self.reconstruct_net(result), scale_factor=1/16)
         return result
