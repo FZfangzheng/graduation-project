@@ -98,6 +98,9 @@ class FusionNet(nn.Module):
             w3 = p3 / (p1 + p3)
 
             new_pre_lsr_landsat2 = w1 * l21 + w3 * l23
+            new_pre_lsr_landsat2 = interpolate(new_pre_lsr_landsat2, scale_factor=10)
+            lsr_landsat1 = interpolate(lsr_landsat1, scale_factor=10)
+            lsr_landsat3 = interpolate(lsr_landsat3, scale_factor=10)
             pre_landsat2 = self.sr(new_pre_lsr_landsat2)
             pre_landsat1 = self.sr(lsr_landsat1)
             pre_landsat3 = self.sr(lsr_landsat3)
