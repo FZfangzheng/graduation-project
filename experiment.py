@@ -72,12 +72,12 @@ class Experiment(object):
                 self.optimizer.step()
 
                 with torch.no_grad():
-                    score = utils.score(prediction, target, utils.ssim)
-                epoch_score.update(score)
+                    score = F.mse_loss(prediction, target)
+                epoch_score.update(score.item())
                 t_end = timer()
                 self.logger.info(f'Epoch[{n_epoch} {new_idx}/{batches}] - '
                                  f'Loss: {loss.item():.10f} - '
-                                 f'MSE: {score:.5f} - '
+                                 f'MSE: {score.item():.5f} - '
                                  f'Time: {t_end - t_start}s')
 
         self.logger.info(f'Epoch[{n_epoch}] - {datetime.now()}')
