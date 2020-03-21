@@ -7,9 +7,16 @@ from ssim import msssim
 NUM_BANDS = 6
 
 
+def getads(array):
+    total = 0
+    for item in array.flat:
+        total += item
+    return total
+
+
 def conv(in_channels, out_channels, size, stride=1):
     return nn.Sequential(
-        nn.ReplicationPad2d((size-1)/2),
+        nn.ReplicationPad2d(int((size-1)/2)),
         nn.Conv2d(in_channels, out_channels, size, stride=stride)
     )
 
@@ -66,15 +73,9 @@ class FusionNet(nn.Module):
         # 首先因为数据集给出的图像尺度相同，所以做下采样处理，下采样降低十倍分辨率
         if self.training:
             modis1 = interpolate(inputs[0], scale_factor=0.1)
-            print(modis1.shape)
             lsr_landsat1 = interpolate(inputs[1], scale_factor=0.1)
-            print(lsr_landsat1.shape)
-            nml1 = self.nml(modis1)
-            print(nml1.shape)
-            pre_lsr_landsat1 = torch.add(modis1, nml1)
-            sr1 = self.sr(pre_lsr_landsat1)
-            print(sr1.shape)
-            pre_landsat1 = torch.add(pre_lsr_landsat1, sr1)
+            pre_lsr_landsat1 = torch.add(modis1, self.nml(modis1))
+            pre_landsat1 = torch.add(pre_lsr_landsat1, self.sr(pre_lsr_landsat1))
             return pre_lsr_landsat1, lsr_landsat1, pre_landsat1
         else:
             modis1 = interpolate(inputs[0], scale_factor=0.1)
@@ -90,8 +91,8 @@ class FusionNet(nn.Module):
             l21 = lsr_landsat1.mul(torch.div(pre_lsr_landsat2, pre_lsr_landsat1))
             l23 = lsr_landsat3.mul(torch.div(pre_lsr_landsat2, pre_lsr_landsat3))
 
-            p1 = 1 / (sum(sum(torch.sub(pre_lsr_landsat2, pre_lsr_landsat1))).item())
-            p3 = 1 / (sum(sum(torch.sub(pre_lsr_landsat2, pre_lsr_landsat3))).item())
+            p1 = 1 / getads(torch.sub(pre_lsr_landsat2, pre_lsr_landsat1))
+            p3 = 1 / getads(torch.sub(pre_lsr_landsat2, pre_lsr_landsat3))
             w1 = p1 / (p1 + p3)
             w3 = p3 / (p1 + p3)
 
