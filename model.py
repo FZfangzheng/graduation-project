@@ -18,7 +18,7 @@ def getads(array):
 
 def conv(in_channels, out_channels, size, stride=1):
     return nn.Sequential(
-        nn.ReplicationPad2d((size-1)/2),
+        nn.ReplicationPad2d(int((size-1)/2)),
         nn.Conv2d(in_channels, out_channels, size, stride=stride)
     )
 
