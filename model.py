@@ -82,7 +82,8 @@ class REncoder(nn.Sequential):
     def __init__(self):
         channels = [NUM_BANDS * 3, 32, 64, 128]
         super(REncoder, self).__init__(
-            ResidualBlock(channels[0], channels[1]),
+            conv3x3(channels[0], channels[1]),
+            nn.ReLU(True),
             ResidualBlock(channels[1], channels[2]),
             conv3x3(channels[2], channels[3]),
         )
