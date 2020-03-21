@@ -66,16 +66,15 @@ class Experiment(object):
             for i in range(len(all_data)):
                 new_idx += 1
                 inputs = all_data[i]
-                target = all_data[i][-1]
                 self.optimizer.zero_grad()
-                pre_lsr_landsat1, lsr_landsat1, pre_landsat1 = self.model(inputs)
-                loss = (0.5 * (F.mse_loss(pre_lsr_landsat1, lsr_landsat1) + F.mse_loss(pre_landsat1, target)))
+                gt_res1, res_lsr_landsat1, gt_res2, res_landsat = self.model(inputs)
+                loss = (0.5 * (F.mse_loss(gt_res1, res_lsr_landsat1) + F.mse_loss(gt_res2, res_landsat)))
                 epoch_loss.update(loss.item())
                 loss.backward()
                 self.optimizer.step()
 
                 with torch.no_grad():
-                    score = (0.5 * (F.mse_loss(pre_lsr_landsat1, lsr_landsat1) + F.mse_loss(pre_landsat1, target)))
+                    score = (0.5 * (F.mse_loss(gt_res1, res_lsr_landsat1) + F.mse_loss(gt_res2, res_landsat)))
                 epoch_score.update(score.item())
                 t_end = timer()
                 self.logger.info(f'Epoch[{n_epoch} {new_idx}/{batches}] - '

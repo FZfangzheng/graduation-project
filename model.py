@@ -74,10 +74,14 @@ class FusionNet(nn.Module):
         if self.training:
             modis1 = interpolate(inputs[0], scale_factor=0.1)
             lsr_landsat1 = interpolate(inputs[1], scale_factor=0.1)
-            pre_lsr_landsat1 = torch.add(modis1, self.nml(modis1))
+            hsr_landsat1 = interpolate(lsr_landsat1, scale_factor=10)
+            gt_res1 = lsr_landsat1 - modis1
+            res_lsr_landsat1 = self.nml(modis1)
+            pre_lsr_landsat1 = modis1 + res_lsr_landsat1
             new_pre_lsr_landsat1 = interpolate(pre_lsr_landsat1, scale_factor=10)
-            pre_landsat1 = torch.add(new_pre_lsr_landsat1, self.sr(new_pre_lsr_landsat1))
-            return pre_lsr_landsat1, lsr_landsat1, pre_landsat1
+            res_landsat = self.sr(new_pre_lsr_landsat1)
+            gt_res2 = inputs[1] - hsr_landsat1
+            return gt_res1, res_lsr_landsat1, gt_res2, res_landsat
         else:
             modis1 = interpolate(inputs[0], scale_factor=0.1)
             lsr_landsat1 = interpolate(inputs[1], scale_factor=0.1)
