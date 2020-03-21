@@ -77,7 +77,7 @@ class Experiment(object):
                 t_end = timer()
                 self.logger.info(f'Epoch[{n_epoch} {new_idx}/{batches}] - '
                                  f'Loss: {loss.item():.10f} - '
-                                 f'MSE: {score.item():.5f} - '
+                                 f'MSE: {score:.5f} - '
                                  f'Time: {t_end - t_start}s')
 
         self.logger.info(f'Epoch[{n_epoch}] - {datetime.now()}')
