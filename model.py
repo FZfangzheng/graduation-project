@@ -16,7 +16,7 @@ def conv(in_channels, out_channels, size, stride=1):
 
 def interpolate(inputs, size=None, scale_factor=None):
     return F.interpolate(inputs, size=size, scale_factor=scale_factor,
-                         mode='nearest', align_corners=True)
+                         mode='bilinear', align_corners=True)
 
 
 class CompoundLoss(nn.Module):
