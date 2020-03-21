@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import numpy as np
 from ssim import msssim
 
 NUM_BANDS = 6
@@ -92,8 +92,8 @@ class FusionNet(nn.Module):
             l21 = lsr_landsat1.mul(torch.div(pre_lsr_landsat2, pre_lsr_landsat1))
             l23 = lsr_landsat3.mul(torch.div(pre_lsr_landsat2, pre_lsr_landsat3))
 
-            p1 = 1 / getads(torch.sub(pre_lsr_landsat2, pre_lsr_landsat1))
-            p3 = 1 / getads(torch.sub(pre_lsr_landsat2, pre_lsr_landsat3))
+            p1 = 1 / getads(np.array(torch.sub(pre_lsr_landsat2, pre_lsr_landsat1)))
+            p3 = 1 / getads(np.array(torch.sub(pre_lsr_landsat2, pre_lsr_landsat3)))
             w1 = p1 / (p1 + p3)
             w3 = p3 / (p1 + p3)
 
@@ -105,8 +105,8 @@ class FusionNet(nn.Module):
             l21 = inputs[1].mul(torch.div(pre_landsat2, pre_landsat1))
             l23 = inputs[3].mul(torch.div(pre_landsat2, pre_landsat3))
 
-            p1 = 1 / (sum(sum(torch.sub(pre_landsat2, pre_landsat1))).item())
-            p3 = 1 / (sum(sum(torch.sub(pre_landsat2, pre_landsat3))).item())
+            p1 = 1 / getads(np.array(torch.sub(pre_landsat2, pre_landsat1)))
+            p3 = 1 / getads(np.array(torch.sub(pre_landsat2, pre_landsat3)))
             w1 = p1 / (p1 + p3)
             w3 = p3 / (p1 + p3)
 
