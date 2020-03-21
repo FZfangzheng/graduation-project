@@ -91,7 +91,8 @@ class FusionNet(nn.Module):
 
             l21 = lsr_landsat1.mul(torch.div(pre_lsr_landsat2, pre_lsr_landsat1))
             l23 = lsr_landsat3.mul(torch.div(pre_lsr_landsat2, pre_lsr_landsat3))
-
+            print(getads((torch.sub(pre_lsr_landsat2, pre_lsr_landsat1)).cpu().numpy()))
+            print(getads((torch.sub(pre_lsr_landsat2, pre_lsr_landsat3)).cpu().numpy()))
             p1 = 1 / getads((torch.sub(pre_lsr_landsat2, pre_lsr_landsat1)).cpu().numpy())
             p3 = 1 / getads((torch.sub(pre_lsr_landsat2, pre_lsr_landsat3)).cpu().numpy())
             w1 = p1 / (p1 + p3)
