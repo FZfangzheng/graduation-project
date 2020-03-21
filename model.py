@@ -97,10 +97,16 @@ class FusionNet(nn.Module):
         modis1 = inputs[0]
         landsat1 = inputs[1]
         modis = inputs[2]
+        print(inputs[0])
+        print(inputs[1])
+        print(inputs[2])
         htls = self.coarse_net(modis)
 
         htls1 = self.coarse_net(modis1)
         lths1 = self.fine_net(landsat1)
+        print(htls.shape)
+        print(lths1.shape)
+        print(htls1.shape)
         result = htls + lths1 - htls1
 
         result = self.reconstruct_net(result)
