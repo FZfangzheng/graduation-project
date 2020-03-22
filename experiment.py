@@ -90,13 +90,17 @@ class Experiment(object):
         with torch.no_grad():
             for data in data_loader:
                 data = [im.to(self.device) for im in data]
-                inputs = data[:-1]
-                target = data[-1]
-                prediction = self.model(inputs)
-                loss = self.criterion(prediction, target)
-                epoch_loss.update(loss.item())
-                score = F.mse_loss(prediction, target)
-                epoch_score.update(score.item())
+                data1 = data[0:4]
+                data2 = data[2:6]
+                all_data = [data1, data2]
+                for i in range(len(all_data)):
+                    inputs = all_data[i][:-1]
+                    target = all_data[i][-1]
+                    prediction = self.model(inputs)
+                    loss = self.criterion(prediction, target)
+                    epoch_loss.update(loss.item())
+                    score = F.mse_loss(prediction, target)
+                    epoch_score.update(score.item())
             # 记录Checkpoint
             is_best = epoch_score.avg >= best_acc
             state = {'epoch': n_epoch,
