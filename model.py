@@ -67,8 +67,7 @@ class REncoder(nn.Sequential):
             nn.ReLU(True),
             conv3x3(channels[2], channels[3]),
             nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
-            nn.ReLU(True)
+            conv3x3(channels[3], channels[4])
         )
 
 
