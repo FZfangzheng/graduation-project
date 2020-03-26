@@ -164,8 +164,7 @@ class Experiment(object):
 
         scaled_patch_size = tuple(i * self.scale for i in patch_size)
         scaled_image_size = tuple(i * self.scale for i in self.image_size)
-        # scale_factor = 10000
-        scale_factor = 1
+        scale_factor = 10000
         with torch.no_grad():
             im_count = 0
             patches = []

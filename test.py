@@ -69,5 +69,25 @@ def load_image_pair(im_dir, n_refs):
     assert images[0].shape[2] * SCALE == images[1].shape[2]
     return images
 
-warnings.filterwarnings('ignore')
-load_image_pair("/home/dataset/train/1", 1)
+# warnings.filterwarnings('ignore')
+# load_image_pair("/home/dataset/train/1", 1)
+images = [p for p in Path("D:/BaiduNetdiskDownload/Datasets/AHB/Landsat").glob('*') if p.is_file()]
+max = 0
+min = 100
+tim = 1
+for i in images:
+    print(tim)
+    tim += 1
+    ds = gdal.Open(str(i))
+    im = ds.ReadAsArray().astype(np.float32)
+    for t in im.flat:
+        if t > max:
+            max = t
+        if t < min:
+            min = t
+    del ds
+    print(max)
+    print(min)
+print("final")
+print(max)
+print(min)
