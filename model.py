@@ -44,45 +44,38 @@ class CompoundLoss(nn.Module):
 
 class FEncoder(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS, 32, 64, 128, 256]
+        channels = [NUM_BANDS, 32, 64, 128]
         super(FEncoder, self).__init__(
             conv3x3(channels[0], channels[1]),
             nn.ReLU(True),
             conv3x3(channels[1], channels[2]),
             nn.ReLU(True),
             conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
             nn.ReLU(True)
         )
 
 
 class REncoder(nn.Sequential):
     def __init__(self):
-        channels = [NUM_BANDS * 4, 32, 64, 128, 256]
+        channels = [NUM_BANDS * 3, 32, 64, 128]
         super(REncoder, self).__init__(
             conv3x3(channels[0], channels[1]),
             nn.ReLU(True),
             conv3x3(channels[1], channels[2]),
             nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            conv3x3(channels[3], channels[4]),
-            nn.ReLU(True)
+            conv3x3(channels[2], channels[3])
         )
 
 
 class Decoder(nn.Sequential):
     def __init__(self):
-        channels = [256, 128, 64, 32, NUM_BANDS]
+        channels = [128, 64, 32, NUM_BANDS]
         super(Decoder, self).__init__(
             conv3x3(channels[0], channels[1]),
             nn.ReLU(True),
             conv3x3(channels[1], channels[2]),
             nn.ReLU(True),
-            conv3x3(channels[2], channels[3]),
-            nn.ReLU(True),
-            nn.Conv2d(channels[3], channels[4], 1)
+            nn.Conv2d(channels[2], channels[3], 1)
         )
 
 class Truing(nn.Sequential):
@@ -97,6 +90,7 @@ class Truing(nn.Sequential):
             nn.ReLU(True),
             nn.Conv2d(channels[3], channels[4], 1)
         )
+
 
 class Pretrained(nn.Sequential):
     def __init__(self):
@@ -124,12 +118,10 @@ class FusionNet(nn.Module):
         # inputs[1]是参考Landsat，inputs[0]和inputs[-1](即数组最后一个)是参考MODIS和目标时间的MODIS
         # inputs[0] = interpolate(inputs[0], scale_factor=16)
         # inputs[-1] = interpolate(inputs[-1], scale_factor=16)
-        c_diff1 = torch.sub(inputs[-1], inputs[0])
-        prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1], c_diff1), 1))
+        prev_diff = self.residual(torch.cat((inputs[0], inputs[1], inputs[-1]), 1))
         # len==5则表示有两对参考
         if len(inputs) == 5:
-            c_diff2 = torch.sub(inputs[2], inputs[-1])
-            next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1], c_diff2), 1))
+            next_diff = self.residual(torch.cat((inputs[2], inputs[3], inputs[-1]), 1))
             if self.training:
                 prev_fusion = self.encoder(inputs[1]) + prev_diff
                 next_fusion = self.encoder(inputs[3]) + next_diff
@@ -154,8 +146,6 @@ class FusionNet(nn.Module):
                 # next_fusion[prev_dist < next_dist] = zero
                 # result = prev_fusion + next_fusion
                 result = self.decoder(result)
-                f_diff = torch.sub(inputs[3], inputs[1])
-                result = self.truing(torch.cat((result, f_diff), 1))
                 return result
         else:
             return self.decoder(self.encoder(inputs[1]) + prev_diff)
